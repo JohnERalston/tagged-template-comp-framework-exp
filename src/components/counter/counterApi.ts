@@ -1,4 +1,4 @@
-import { getE } from "./tag";
+import { getE } from "../../tag";
 
 export function CounterApiFn() {
   const elements = {

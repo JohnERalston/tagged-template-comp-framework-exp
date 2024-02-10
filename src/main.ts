@@ -1,5 +1,5 @@
-import { CounterApiFn } from "./counterApi";
-import { Counter } from "./counter";
+import { CounterApiFn } from "./components/counter/counterApi";
+import { Counter } from "./components/counter/counter";
 import { bind, tag } from "./tag";
 
 const counterApi1 = CounterApiFn();
