@@ -37,10 +37,16 @@ export function mount(selector: string, element: string) {
   Array.from(initFns).forEach((init) => init());
 }
 
-export const euid = () => `a${crypto.randomUUID()}`;
+const euid = () => `a${crypto.randomUUID()}`;
 export const eid = (): string => `eid="${euid()}"`;
-export const ge = (eid: string) => {
+export const ge = <ElemType extends HTMLElement>(eid: string) => {
   const id = eid.split("=")[1];
-  return document.querySelector(`[eid=${id}]`) as HTMLElement;
+  return document.querySelector<ElemType>(`[eid=${id}]`)!;
 };
 export const bind = (fn: initFn) => initFns.add(fn);
+
+export const tempDelayBind = (fn: initFn) => {
+  setTimeout(() => {
+    fn();
+  }, 500);
+};
