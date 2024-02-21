@@ -1,16 +1,23 @@
-import { bind, eid, ge, html } from "../framework/tag";
+import { cid, eid, ge, html, newBind } from "../framework/tag";
 import { todoApi } from "./todoMothership";
 
 export function AddTodoItem() {
-  bind(init);
+  const qComp = cid();
+  newBind({ cid: qComp, onAdded, onRemoved: () => {} });
   const qIp = eid();
   const qBtn = eid();
+  let btn = document.createElement("button");
 
-  function init() {
-    ge(qBtn).addEventListener("click", () => {
-      todoApi.addTodo(ge<HTMLInputElement>(qIp).value);
-    });
+  function addTodo() {
+    todoApi.addTodo(ge<HTMLInputElement>(qIp).value);
   }
 
-  return html`<div><input ${qIp} /> <button ${qBtn}>Add item</button></div>`;
+  function onAdded() {
+    btn = ge(qBtn);
+    btn.addEventListener("click", addTodo);
+  }
+
+  return html`<div ${qComp}>
+    <input ${qIp} /> <button ${qBtn}>Add item</button>
+  </div>`;
 }

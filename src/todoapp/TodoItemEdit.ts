@@ -1,8 +1,9 @@
-import { bind, eid, ge, html, tempDelayBind } from "../framework/tag";
+import { cid, eid, ge, html, newBind } from "../framework/tag";
 import { ITodoItem } from "./todoMothership";
 
 export function TodoItemEdit(todoItem: ITodoItem) {
-  tempDelayBind(init);
+  const qComp = cid();
+  newBind({ cid: qComp, onAdded, onRemoved: () => {} });
   const qIp = eid();
   const qCommitEdit = eid();
   const qCancelEdit = eid();
@@ -16,12 +17,12 @@ export function TodoItemEdit(todoItem: ITodoItem) {
     todoItem.renaming = false;
   }
 
-  function init() {
+  function onAdded() {
     ge(qCommitEdit).addEventListener("click", commitEdit);
     ge(qCancelEdit).addEventListener("click", cancelEdit);
   }
 
-  return html`<div class="todo-item">
+  return html`<div ${qComp} class="todo-item">
     <input ${qIp} value="${todoItem.name}" />
     <button ${qCommitEdit}>Rename</button>
     <button ${qCancelEdit}>Cancel</button>

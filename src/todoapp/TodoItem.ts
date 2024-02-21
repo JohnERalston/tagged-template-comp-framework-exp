@@ -1,14 +1,15 @@
-import { eid, ge, html, tempDelayBind } from "../framework/tag";
+import { cid, eid, ge, html, newBind } from "../framework/tag";
 import { TodoItemEdit } from "./TodoItemEdit";
 import { TodoItemRead } from "./TodoItemRead";
 import { ObservableTodoItem } from "./todoMothership";
 
 export function TodoItem({ observe, unObserve, state }: ObservableTodoItem) {
-  tempDelayBind(init);
-  const qCont = eid();
+  const qComp = cid();
+  const qWrap = eid();
+  newBind({ cid: qComp, onAdded, onRemoved });
 
   function onRenamingChange() {
-    const wrap = ge(qCont);
+    const wrap = ge(qWrap);
     if (state.renaming) {
       wrap.innerHTML = TodoItemEdit(state);
     } else {
@@ -16,22 +17,14 @@ export function TodoItem({ observe, unObserve, state }: ObservableTodoItem) {
     }
   }
 
-  function init() {
-    const wrap = ge(qCont);
+  function onAdded() {
     observe(["renaming"], onRenamingChange);
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (
-          mutation.type === "childList" &&
-          Array.from(mutation.removedNodes).includes(wrap)
-        ) {
-          // Element was removed, do something here
-          unObserve(onRenamingChange);
-        }
-      });
-    });
-    observer.observe(wrap.parentNode, { childList: true });
+  }
+  function onRemoved() {
+    unObserve(onRenamingChange);
   }
 
-  return html` <div ${qCont}>${TodoItemRead(state)}</div> `;
+  return html`<div ${qComp}>
+    <div ${qWrap}>${TodoItemRead(state)}</div>
+  </div>`;
 }

@@ -1,21 +1,31 @@
-import { bind, eid, ge, html } from "../framework/tag";
+import { cid, eid, ge, html, newBind } from "../framework/tag";
 import { AddTodoItem } from "./AddTodoItem";
 import { TodoItem } from "./TodoItem";
-import { observeTodo, todoState } from "./todoMothership";
+import { observeTodo, unobserveTodo, todoState } from "./todoMothership";
 
 export function TodoItemList() {
-  // bind(init);
-  const qCont = eid();
-  observeTodo(["todoItems"], () => {
-    ge(qCont).innerHTML = getItems();
-  });
+  const qComp = cid();
+  newBind({ cid: qComp, onAdded, onRemoved });
+  const qItems = eid();
+
+  function setItems() {
+    ge(qItems).innerHTML = getItems();
+  }
+
+  function onAdded() {
+    observeTodo(["todoItems"], setItems);
+  }
+
+  function onRemoved() {
+    unobserveTodo(setItems);
+  }
 
   function getItems() {
     return todoState.todoItems.map((item) => TodoItem(item)).join("");
   }
 
-  // function init() {    }
-
-  return html`${AddTodoItem()}
-    <div ${qCont}>${getItems()}</div>`;
+  return html`<div ${qComp}>
+    ${AddTodoItem()}
+    <div ${qItems}>${getItems()}</div>
+  </div>`;
 }

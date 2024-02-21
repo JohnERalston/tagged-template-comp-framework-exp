@@ -11,12 +11,15 @@ export interface ITodoItem {
 export type ObservableTodoItem = ReturnType<typeof stateful<ITodoItem>>;
 
 const tsMs = stateful<{ todoItems: ObservableTodoItem[] }>({ todoItems: [] });
-const { state: todoState, observe: observeTodo } = tsMs;
-// const { todoItems } = todoState;
+const {
+  state: todoState,
+  observe: observeTodo,
+  unObserve: unobserveTodo,
+} = tsMs;
 
 const todoApi = todoApiFn();
 
-export { todoState, observeTodo, todoApi };
+export { todoState, observeTodo, unobserveTodo, todoApi };
 
 function todoApiFn() {
   return {

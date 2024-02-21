@@ -1,8 +1,9 @@
-import { eid, ge, html, tempDelayBind } from "../framework/tag";
+import { cid, eid, ge, html, newBind } from "../framework/tag";
 import { ITodoItem, todoApi } from "./todoMothership";
 
 export function TodoItemRead(todoItem: ITodoItem) {
-  tempDelayBind(init);
+  const qComp = cid();
+  newBind({ cid: qComp, onAdded, onRemoved: () => {} });
   const qEditBtn = eid();
   const qDelBtn = eid();
 
@@ -14,13 +15,13 @@ export function TodoItemRead(todoItem: ITodoItem) {
     todoApi.removeTodo(todoItem.id);
   }
 
-  function init() {
+  function onAdded() {
     ge(qEditBtn).addEventListener("click", initEdit);
     ge(qDelBtn).addEventListener("click", initDel);
   }
 
   return html`
-    <div class="todo-item">
+    <div ${qComp} class="todo-item">
       <div class="todo-name">${todoItem.name}</div>
       <button ${qEditBtn}>Edit</button>
       <button ${qDelBtn}>X</button>
