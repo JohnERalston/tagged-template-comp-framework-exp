@@ -31,7 +31,7 @@ export const eid = (): string => `${compElem}="${euid()}"`;
 export const cid = (): string => `${compPending}="${euid()}"`;
 export const ge = <ElemType extends HTMLElement>(eid: string) => {
   const id = eid.split("=")[1];
-  return document.querySelector<ElemType>(`[eid=${id}]`)!;
+  return document.querySelector<ElemType>(`[${compElem}=${id}]`)!;
 };
 
 export { newBind };
