@@ -1,7 +1,9 @@
-import { $a, $f, $h, motherShip } from "../app/mothership";
+import { motherShip } from "../app/mothership";
 import { html } from "../framework/tag";
 
 export function TodoItemList() {
+  const { $a, $f, $h } = motherShip;
+
   let a = 0;
   setInterval(() => {
     a += 1;
