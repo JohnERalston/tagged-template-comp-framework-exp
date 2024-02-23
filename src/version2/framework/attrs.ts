@@ -1,5 +1,3 @@
-export const compPending = "cid";
-export const compActive = "icid";
 export const attrObs = "oa";
-export const iHtmlObs = "oih";
-export const iFnObs = "oif";
+export const innerHtmlObs = "oih";
+export const fnObs = "of";

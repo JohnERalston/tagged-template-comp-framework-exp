@@ -12,6 +12,10 @@ export function TodoItemList() {
   const getContent = (param: number) =>
     html`<div>
       ${motherShip.state.name} is aged ${motherShip.state.age} (${param})
+
+      <div ${$f(["age"], () => String(motherShip.state.age))}>
+        ${motherShip.state.age}
+      </div>
     </div>`;
   return html`<h1>Yo</h1>
     <div ${$a("age", "data-age")} ${$h("age")}>${motherShip.state.age}</div>

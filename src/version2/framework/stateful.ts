@@ -1,5 +1,6 @@
 import { __createStore } from "./store";
-import { attrObs, iFnObs, iHtmlObs } from "./attrs";
+import { attrObs, fnObs, innerHtmlObs } from "./attrs";
+import { $Map } from "./garbageCollector";
 
 interface Stateful<T> {
   state: T;
@@ -10,21 +11,25 @@ interface Stateful<T> {
   $f: (keys: (keyof T)[], fn: () => string) => string;
 }
 
+const extractUid = (uid: string) => {
+  return uid.split("=")[1].replaceAll('"', "");
+};
+
 const euid = () => `a${crypto.randomUUID()}`;
 export const obsAttr = (): string => `${attrObs}="${euid()}"`;
-export const obsInnerHtml = (): string => `${iHtmlObs}="${euid()}"`;
-export const obsFn = (): string => `${iFnObs}="${euid()}"`;
+export const obsInnerHtml = (): string => `${innerHtmlObs}="${euid()}"`;
+export const obsFn = (): string => `${fnObs}="${euid()}"`;
 export const gObsAttr = <ElemType extends HTMLElement>(eid: string) => {
   const id = eid.split("=")[1];
   return document.querySelector<ElemType>(`[${attrObs}=${id}]`)!;
 };
 export const gObsIHtml = <ElemType extends HTMLElement>(eid: string) => {
   const id = eid.split("=")[1];
-  return document.querySelector<ElemType>(`[${iHtmlObs}=${id}]`)!;
+  return document.querySelector<ElemType>(`[${innerHtmlObs}=${id}]`)!;
 };
 export const gObsFn = <ElemType extends HTMLElement>(eid: string) => {
   const id = eid.split("=")[1];
-  return document.querySelector<ElemType>(`[${iFnObs}=${id}]`)!;
+  return document.querySelector<ElemType>(`[${fnObs}=${id}]`)!;
 };
 
 export function stateful<T extends object>(state: T): Stateful<T> {
@@ -46,26 +51,33 @@ export function stateful<T extends object>(state: T): Stateful<T> {
     unObserve: unregister,
     $h: (key: keyof typeof state) => {
       const qId = obsInnerHtml();
-      observe([key], () => {
+      const fn = () => {
         const elem = gObsIHtml(qId);
         elem.innerHTML = String(state[key]);
-      });
+      };
+      observe([key], fn);
+      $Map.set(extractUid(qId), () => unregister(fn));
       return qId;
     },
     $a: (key: keyof typeof state, attributeName: string) => {
       const qId = obsAttr();
-      observe([key], () => {
+      const fn = () => {
         const elem = gObsAttr(qId);
         elem.setAttribute(attributeName, String(state[key]));
-      });
+      };
+      observe([key], fn);
+      $Map.set(extractUid(qId), () => unregister(fn));
       return `${qId} ${attributeName}=${state[key]}`;
     },
-    $f: (keys: (keyof typeof state)[], fn: () => string) => {
+    $f: (keys: (keyof typeof state)[], setter: () => string) => {
       const qId = obsFn();
-      observe(keys, () => {
+      const fn = () => {
         const elem = gObsFn(qId);
-        elem.innerHTML = fn();
-      });
+        if (!elem) return;
+        elem.innerHTML = setter();
+      };
+      observe(keys, fn);
+      $Map.set(extractUid(qId), () => unregister(fn));
       return qId;
     },
   };
