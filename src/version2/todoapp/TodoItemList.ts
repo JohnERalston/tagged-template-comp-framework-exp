@@ -13,7 +13,7 @@ export function TodoItemList() {
     html`<div>
       ${motherShip.state.name} is aged ${motherShip.state.age} (${param})
 
-      <div ${$f(["age"], () => String(motherShip.state.age))}>
+      <div ${$f(() => String(motherShip.state.age))}>
         ${motherShip.state.age}
       </div>
     </div>`;
@@ -22,5 +22,5 @@ export function TodoItemList() {
     <button>Inc</button>
     <hr />
     <hr />
-    <div ${$f(["age", "name"], () => getContent(a))}>${getContent(a)}</div> `;
+    <div ${$f(() => getContent(a))}>${getContent(a)}</div> `;
 }

@@ -8,8 +8,10 @@ interface Stateful<T> {
   unObserve: (fn: Function) => void;
   $h: (key: keyof T) => string;
   $a: (key: keyof T, attributeName: string) => string;
-  $f: (keys: (keyof T)[], fn: () => string) => string;
+  $f: (fn: () => string) => string;
 }
+
+let reactiveFunctionAtHand = () => {};
 
 const extractUid = (uid: string) => {
   return uid.split("=")[1].replaceAll('"', "");
@@ -46,6 +48,10 @@ export function stateful<T extends object>(state: T): Stateful<T> {
         setUpdated([property]);
         return true;
       },
+      get(target: any, property: string) {
+        register(reactiveFunctionAtHand, [property]);
+        return target[property];
+      },
     }),
     observe,
     unObserve: unregister,
@@ -69,14 +75,17 @@ export function stateful<T extends object>(state: T): Stateful<T> {
       $Map.set(extractUid(qId), () => unregister(fn));
       return `${qId} ${attributeName}=${state[key]}`;
     },
-    $f: (keys: (keyof typeof state)[], setter: () => string) => {
+    $f: (setter: () => string) => {
       const qId = obsFn();
       const fn = () => {
         const elem = gObsFn(qId);
         if (!elem) return;
         elem.innerHTML = setter();
       };
-      observe(keys, fn);
+      //run it to register deps
+      reactiveFunctionAtHand = fn;
+      setter();
+      // observe(keys, fn);
       $Map.set(extractUid(qId), () => unregister(fn));
       return qId;
     },
