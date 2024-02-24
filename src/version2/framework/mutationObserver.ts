@@ -3,7 +3,7 @@
 // I think not running them is more desirable
 // when removed, unobserve and remove from here
 
-import { attrObs, fnObs, innerHtmlObs } from "./attrs";
+import { attrGroupObs, attrObs, fnObs, innerHtmlObs } from "./attrs";
 import { $Map } from "./garbageCollector";
 
 // in fact the same map can do for them all
@@ -37,6 +37,10 @@ export function whenRemoving(notify: (uid: string) => void) {
         Array.from(mutation.removedNodes),
         attrObs
       );
+      const attrGroupObsElements = getElements(
+        Array.from(mutation.removedNodes),
+        attrGroupObs
+      );
       const innerHtmlObsElements = getElements(
         Array.from(mutation.removedNodes),
         innerHtmlObs
@@ -48,6 +52,7 @@ export function whenRemoving(notify: (uid: string) => void) {
 
       const uids = [
         ...attrObsElements,
+        ...attrGroupObsElements,
         ...innerHtmlObsElements,
         ...fnObsElements,
       ];

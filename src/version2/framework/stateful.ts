@@ -1,6 +1,7 @@
 import { __createStore } from "./store";
-import { attrObs, fnObs, innerHtmlObs } from "./attrs";
+import { attrGroupObs, attrObs, fnObs, innerHtmlObs } from "./attrs";
 import { $Map } from "./garbageCollector";
+import { $attrMap, IAttr } from "./attrMap";
 
 interface Stateful<T> {
   state: T;
@@ -8,6 +9,7 @@ interface Stateful<T> {
   unObserve: (fn: Function) => void;
   $h: (key: keyof T) => string;
   $a: (key: keyof T, attributeName: string) => string;
+  $ag: (fn: () => IAttr) => string;
   $f: (fn: () => string) => string;
 }
 
@@ -19,8 +21,13 @@ const extractUid = (uid: string) => {
 
 const euid = () => `a${crypto.randomUUID()}`;
 export const obsAttr = (): string => `${attrObs}="${euid()}"`;
+export const obsAttrGroup = (): string => `${attrGroupObs}="${euid()}"`;
 export const obsInnerHtml = (): string => `${innerHtmlObs}="${euid()}"`;
 export const obsFn = (): string => `${fnObs}="${euid()}"`;
+export const gObsAttrGroup = <ElemType extends HTMLElement>(eid: string) => {
+  const id = eid.split("=")[1];
+  return document.querySelector<ElemType>(`[${attrGroupObs}=${id}]`)!;
+};
 export const gObsAttr = <ElemType extends HTMLElement>(eid: string) => {
   const id = eid.split("=")[1];
   return document.querySelector<ElemType>(`[${attrObs}=${id}]`)!;
@@ -76,6 +83,37 @@ export function stateful<T extends object>(state: T): Stateful<T> {
       observe([key], fn);
       $Map.set(extractUid(qId), () => unregister(fn));
       return `${qId} ${attributeName}=${state[key]}`;
+    },
+    $ag: (setter: () => IAttr) => {
+      const qId = obsAttrGroup();
+      const fn = () => {
+        const elem = gObsAttrGroup(qId);
+        console.log({ elem });
+        if (!elem) return;
+
+        // TODO
+        // DIFF
+
+        // TODO: clean up in the garbage collector
+        const mappedAttrs = $attrMap.get(extractUid(qId))!;
+        Object.keys(mappedAttrs).forEach((attrName) => {
+          elem.removeAttribute(attrName);
+        });
+        const attrs = setter();
+        const attrNames = Object.keys(attrs);
+        attrNames.forEach((attrName) => {
+          elem.setAttribute(attrName, attrs[attrName]);
+        });
+        $attrMap.set(extractUid(qId), attrs);
+      };
+      reactiveFunctionAtHand = fn;
+      const attrs = setter();
+      const attrNames = Object.keys(attrs);
+      reactiveFunctionAtHand = null;
+      $attrMap.set(extractUid(qId), attrs);
+      $Map.set(extractUid(qId), () => unregister(fn));
+      const attrStrings = attrNames.map((attr) => `${attr}="${attrs[attr]}"`);
+      return `${qId} ${attrStrings.join(" ")}`;
     },
     $f: (setter: () => string) => {
       const qId = obsFn();
