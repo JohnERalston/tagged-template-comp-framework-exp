@@ -11,7 +11,7 @@ interface Stateful<T> {
   $f: (fn: () => string) => string;
 }
 
-let reactiveFunctionAtHand = () => {};
+let reactiveFunctionAtHand: (() => void) | null = null;
 
 const extractUid = (uid: string) => {
   return uid.split("=")[1].replaceAll('"', "");
@@ -49,7 +49,9 @@ export function stateful<T extends object>(state: T): Stateful<T> {
         return true;
       },
       get(target: any, property: string) {
-        register(reactiveFunctionAtHand, [property]);
+        if (reactiveFunctionAtHand) {
+          register(reactiveFunctionAtHand, [property]);
+        }
         return target[property];
       },
     }),
@@ -85,7 +87,7 @@ export function stateful<T extends object>(state: T): Stateful<T> {
       //run it to register deps
       reactiveFunctionAtHand = fn;
       setter();
-      // observe(keys, fn);
+      reactiveFunctionAtHand = null;
       $Map.set(extractUid(qId), () => unregister(fn));
       return qId;
     },
