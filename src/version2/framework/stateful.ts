@@ -88,7 +88,6 @@ export function stateful<T extends object>(state: T): Stateful<T> {
       const qId = obsAttrGroup();
       const fn = () => {
         const elem = gObsAttrGroup(qId);
-        console.log({ elem });
         if (!elem) return;
 
         // TODO
