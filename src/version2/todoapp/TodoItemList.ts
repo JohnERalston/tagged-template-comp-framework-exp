@@ -38,7 +38,9 @@ function TodoItem(todoItem: ObservableTodoItem, i: number) {
   }
 
   return html`
-    <div class="todo-item" ${$f(onRenaming)}>${TodoItemRead(todoItem, i)}</div>
+    <div class="todo-item" ${todoItem.$f(onRenaming)}>
+      ${TodoItemRead(todoItem, i)}
+    </div>
   `;
 }
 
