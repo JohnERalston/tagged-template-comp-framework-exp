@@ -13,6 +13,13 @@ interface Stateful<T> {
   $f: (fn: () => string) => string;
 }
 
+// TODO: - this is a critical bug
+// when the attribute observer functions get nested this is lost,
+// i.e. on nest 1, it gets a new reference
+// then wen nest 2 is over, instead of the old fn being restored
+// it's simply null. So subsequent getters don't get registered
+// array push/pop sounds like it can solve it but
+// we need it to be null when the non observer instance of the function is called
 let reactiveFunctionAtHand: (() => void) | null = null;
 
 const extractUid = (uid: string) => {
