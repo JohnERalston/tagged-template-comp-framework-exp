@@ -19,7 +19,7 @@ const extractUid = (uid: string) => {
   return uid.split("=")[1].replaceAll('"', "");
 };
 
-const euid = () => `a${crypto.randomUUID()}`;
+export const euid = () => `a${crypto.randomUUID()}`;
 export const obsAttr = (): string => `${attrObs}="${euid()}"`;
 export const obsAttrGroup = (): string => `${attrGroupObs}="${euid()}"`;
 export const obsInnerHtml = (): string => `${innerHtmlObs}="${euid()}"`;
@@ -130,3 +130,15 @@ export function stateful<T extends object>(state: T): Stateful<T> {
     },
   };
 }
+
+// let prevRFns: Set<() => void> = new Set();
+// function setReactiveFnAtHand(rFn: () => void) {
+//   if(reactiveFunctionAtHand) {
+//     prevRFns.add(reactiveFunctionAtHand);
+//   }
+//   reactiveFunctionAtHand = rFn;
+// }
+
+// function unsetReactivefnAtHand(rFn: () => void) {
+
+// }

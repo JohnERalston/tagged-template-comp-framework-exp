@@ -1,51 +1,54 @@
-import { motherShip } from "../app/mothership";
-import { IAttr } from "../framework/attrMap";
+import { stateful } from "../framework/stateful";
 import { html } from "../framework/tag";
+import { ITodoItem, todoState, $f } from "./todoMothership";
+
+type ObservableTodoItem = ReturnType<typeof stateful<ITodoItem>>;
+
+function AddTodoItem() {
+  return html`<div>
+    <input id="AddTodoItemIp" />
+    <button id="AddTodoItemAddBtn">Add item</button>
+  </div>`;
+}
+
+function TodoItemRead(todoItem: ObservableTodoItem, i: number) {
+  return html`
+    <div class="todo-item">
+      <div class="todo-name">${todoItem.state.name}</div>
+      <button todoReadEdit idx="${i}">Edit Name</button>
+      <button todoReadREmove idx="${i}">Remove</button>
+    </div>
+  `;
+}
+
+function TodoItemEdit(todoItem: ObservableTodoItem, i: number) {
+  return html`<div class="todo-item">
+    <input id="TodoItemEditIp" value="${todoItem.state.name}" />
+    <button TodoItemEditRenameBtn idx="${i}">Rename</button>
+    <button TodoItemEditCancelBtn idx="${i}">Cancel</button>
+  </div>`;
+}
+
+function TodoItem(todoItem: ObservableTodoItem, i: number) {
+  function onRenaming() {
+    if (todoItem.state.renaming) {
+      return TodoItemEdit(todoItem, i);
+    }
+    return TodoItemRead(todoItem, i);
+  }
+
+  return html`
+    <div class="todo-item" ${$f(onRenaming)}>${TodoItemRead(todoItem, i)}</div>
+  `;
+}
 
 export function TodoItemList() {
-  const { $a, $ag, $f, $h } = motherShip;
+  function getItems() {
+    return todoState.todoItems.map((item, i) => TodoItem(item, i)).join("");
+  }
 
-  let a = 0;
-  setInterval(() => {
-    a += 1;
-  }, 1000);
-
-  let toggle = true;
-
-  const getAttrGroup = (): IAttr => {
-    if (toggle) {
-      toggle = !toggle;
-      return {
-        a: `a1${a} ${motherShip.state.age}`,
-        b: `b1${a} ${motherShip.state.age}`,
-      };
-    } else {
-      toggle = !toggle;
-      return {
-        a: `a1${a} ${motherShip.state.age} aaa`,
-        c: `c1${a} ${motherShip.state.age} cccc`,
-      };
-    }
-  };
-
-  const getContent = (param: number) =>
-    html`<div>
-      ${motherShip.state.name} is aged ${motherShip.state.age} (${param})
-
-      <div ${$f(() => String(motherShip.state.age))}>
-        ${motherShip.state.age}
-      </div>
-    </div>`;
-  return html`<h1>Yo</h1>
-    <!-- need to remove attr also. $a('attr-name', () => ({present: boolean, value: string})) -->
-    <div ${$a("age", "data-age")} ${$h("age")}>${motherShip.state.age}</div>
-    <button>Inc</button>
-    <hr />
-    <hr />
-    <div ${$f(() => getContent(a))}>${getContent(a)}</div>
-    <hr />
-    <hr />
-    <div ${$ag(() => getAttrGroup())}>
-      ${JSON.stringify(getAttrGroup())} This will not update but the atrs will
-    </div> `;
+  return html`<div>
+    ${AddTodoItem()}
+    <div ${$f(getItems)}>${getItems()}</div>
+  </div>`;
 }
