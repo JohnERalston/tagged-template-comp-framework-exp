@@ -1,0 +1,8 @@
+- This is much better than v1
+- Introduced reactive functions
+- There are two main types, attribute and innerHTML
+- <div $f(someFunction)> where some function returns html which is used as the innerHTML for the div
+- the dependency array is inferred from the proxy get trap but see TODO comment re fatal bug
+- It's very apparent that the const {$f, $a, etc} from stateful({}) will get very annoying and buggy because we have inner and outer scopes for these. I.e. there will be multiple instances of these in any component and easy to mix up
+- Thinking that these could be on the same level as stateful and we pass the stateful object to them as well as the the reactive function
+- Also see TODO comment re event handlers. I like that the logic has moved up out of the components but there is big room for improvement here.
