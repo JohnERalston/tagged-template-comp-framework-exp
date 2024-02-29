@@ -1,0 +1,12 @@
+- I think this is better than v2 because the ui updates are fully explicit.
+- Somehow that feels better. When we want to update the UI we're quite clear about what we're doing. We're not issuing unsolicited effects.
+- The $f function is independent of the store too which is desirable.
+- On the negatives:
+- Is it a bit weird that the store.useStore() has to be inside the $f function ?
+- Lots of scope for "it's not working" or...
+- getting the values const {name} = store.useStore() in an outer $f and simply referencing them inside an inner $f. The outer $f will render.
+- It feels verbose e.g. someStore.useStore()
+- I wonder about someStore({updating: value}) //set and someStore() //get ???
+
+- Had played about with attaching $f to the store
+- Also, $f((enabler) => store.useStore(enabler)) but it seemed to create chaos

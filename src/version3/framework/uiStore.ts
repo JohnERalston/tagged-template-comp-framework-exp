@@ -36,6 +36,9 @@ export function createStore<Store>(initialValues: Store) {
     const proxy = new Proxy(store as {}, {
       get(target: any, property: string) {
         const uid = rFunctionTracker.getCurrentRFn();
+        if (!uid) {
+          return target[property];
+        }
         const reactive = $uidUnobserveFnMap.get(uid!)!;
         reactive.unobserveFn = () => unregister(reactive.reactiveKickerFn);
         register(reactive.reactiveKickerFn, [property]);

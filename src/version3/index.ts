@@ -4,6 +4,19 @@ import { createStore } from "./framework/uiStore";
 
 const store = createStore({ count: 0, date: new Date().toISOString() });
 
+function getTodoStore(name: string) {
+  return createStore({
+    id: crypto.randomUUID(),
+    name,
+    done: false,
+    rename: false,
+  });
+}
+
+const toDoListStore = createStore({
+  todoItems: [getTodoStore("one"), getTodoStore("2")],
+});
+
 setInterval(() => {
   store.updateStore((store) => ({ count: store.count + 1 }));
 }, 4000);
