@@ -1,4 +1,5 @@
 import { $uidUnobserveFnMap } from "./garbageCollector";
+import { rFunctionTracker } from "./reactiveFunctionTracker";
 import { __createStore } from "./store";
 
 export function createStore<Store>(initialValues: Store) {
@@ -24,10 +25,7 @@ export function createStore<Store>(initialValues: Store) {
     }
   }
 
-  function useStore(
-    uid: string,
-    initialProps?: Partial<Store> | null | undefined
-  ): Store {
+  function useStore(initialProps?: Partial<Store> | null | undefined): Store {
     const keySet = new Set<string>();
 
     if (initialProps && !initialPropsSet) {
@@ -37,13 +35,10 @@ export function createStore<Store>(initialValues: Store) {
 
     const proxy = new Proxy(store as {}, {
       get(target: any, property: string) {
-        const reactive = $uidUnobserveFnMap.get(uid);
-        if (!reactive) {
-          return target[property];
-        }
+        const uid = rFunctionTracker.getCurrentRFn();
+        const reactive = $uidUnobserveFnMap.get(uid!)!;
         reactive.unobserveFn = () => unregister(reactive.reactiveKickerFn);
-        const update = reactive?.reactiveKickerFn || (() => {});
-        register(update, [property]);
+        register(reactive.reactiveKickerFn, [property]);
         keySet.add(property);
         return target[property];
       },

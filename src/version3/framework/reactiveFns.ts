@@ -1,20 +1,24 @@
 import { extractUid, gObsFn, obsFn } from "./attrs";
 import { $uidUnobserveFnMap } from "./garbageCollector";
-import { ATTR, reactiveConnectorFn } from "./types";
+import { rFunctionTracker } from "./reactiveFunctionTracker";
+import { ATTR, reactiveFn } from "./types";
 
-export function $f(reactiveConnectorFn: reactiveConnectorFn): ATTR {
+export function $f(fn: reactiveFn): ATTR {
   const attr = obsFn();
   const id = extractUid(attr);
-  const reactiveFn = () => {
+  const rFn = () => {
     const elem = gObsFn(attr);
     if (!elem) return;
-    elem.innerHTML = reactiveConnectorFn(id)();
+    rFunctionTracker.setCurrentRFn(id);
+    elem.innerHTML = fn();
+    rFunctionTracker.restorePrevRFn();
   };
   $uidUnobserveFnMap.set(id, {
-    reactiveKickerFn: reactiveFn,
+    reactiveKickerFn: rFn,
     unobserveFn: () => {},
   });
-  const rFn = reactiveConnectorFn(id);
-  $uidUnobserveFnMap.get(id)!.reactiveKickerFn = rFn;
+  rFunctionTracker.setCurrentRFn(id);
+  fn();
+  rFunctionTracker.restorePrevRFn();
   return attr;
 }

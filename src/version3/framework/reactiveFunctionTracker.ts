@@ -1,25 +1,23 @@
-// import { rFunction } from "./types";
+export const rFunctionTracker = trackerFn();
 
-// export const rFunctionTracker = trackerFn();
+function trackerFn() {
+  const rFunctions: string[] = [];
 
-// function trackerFn() {
-//   const rFunctions: rFunction[] = [];
+  return {
+    setCurrentRFn,
+    getCurrentRFn,
+    restorePrevRFn,
+  };
 
-//   return {
-//     setCurrentRFn,
-//     getCurrentRFn,
-//     restorePrevRFn,
-//   };
+  function setCurrentRFn(uid: string) {
+    rFunctions.unshift(uid);
+  }
 
-//   function setCurrentRFn(fn: rFunction) {
-//     rFunctions.unshift(fn);
-//   }
+  function getCurrentRFn(): string | null {
+    return rFunctions[0];
+  }
 
-//   function getCurrentRFn(): rFunction | null {
-//     return rFunctions[0];
-//   }
-
-//   function restorePrevRFn() {
-//     rFunctions.shift();
-//   }
-// }
+  function restorePrevRFn() {
+    rFunctions.shift();
+  }
+}
