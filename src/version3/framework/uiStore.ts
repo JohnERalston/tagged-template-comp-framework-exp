@@ -10,9 +10,8 @@ export function createStore<Store>(initialValues: Store) {
   const { setUpdated, register, unregister } = __createStore();
 
   return {
-    useStore,
+    data,
     updateStore,
-    data: () => Object.freeze({ ...store }),
   };
 
   function updateStore(
@@ -25,7 +24,7 @@ export function createStore<Store>(initialValues: Store) {
     }
   }
 
-  function useStore(initialProps?: Partial<Store> | null | undefined): Store {
+  function data(initialProps?: Partial<Store> | null | undefined): Store {
     const keySet = new Set<string>();
 
     if (initialProps && !initialPropsSet) {

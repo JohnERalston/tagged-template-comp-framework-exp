@@ -13,7 +13,7 @@ function AddTodoItem() {
 function TodoItemRead(todoItem: ReactiveTodoItem, i: number) {
   return html`
     <div class="todo-item">
-      <div class="todo-name" ${$f(() => todoItem.useStore().name)}>
+      <div class="todo-name" ${$f(() => todoItem.data().name)}>
         ${todoItem.data().name}
       </div>
       <button todoReadEdit idx="${i}">Edit Name</button>
@@ -32,7 +32,7 @@ function TodoItemEdit(todoItem: ReactiveTodoItem, i: number) {
 
 function TodoItem(todoItem: ReactiveTodoItem, i: number) {
   function onRenaming() {
-    const { renaming } = todoItem.useStore();
+    const { renaming } = todoItem.data();
     if (renaming) {
       return TodoItemEdit(todoItem, i);
     }
@@ -47,7 +47,7 @@ function TodoItem(todoItem: ReactiveTodoItem, i: number) {
 export function TodoItemList() {
   function getItems() {
     return toDoListStore
-      .useStore()
+      .data()
       .todoItems.map((item, i) => TodoItem(item, i))
       .join("");
   }

@@ -1,3 +1,4 @@
+- Based completely on the outer-state paradigm
 - I think this is better than v2 because the ui updates are fully explicit.
 - Somehow that feels better. When we want to update the UI we're quite clear about what we're doing. We're not issuing unsolicited effects.
 - The $f function is independent of the store too which is desirable.
@@ -10,3 +11,4 @@
 
 - Had played about with attaching $f to the store
 - Also, $f((enabler) => store.useStore(enabler)) but it seemed to create chaos
+- Plus casting too wide a net on each $f() would be less than ideal. The only saving grace is that it would cause obvious problems such as typing in a field that would keep disappearing and reappearing immediately as you type

@@ -30,7 +30,7 @@ function TesterComp() {
     <div>
       <h4>
         Count
-        <span ${$f(() => String(store.useStore().count))}
+        <span ${$f(() => String(store.data().count))}
           >${store.data().count}</span
         >
       </h4>
@@ -38,7 +38,7 @@ function TesterComp() {
     <div>
       <h4>
         Date
-        <span ${$f(() => store.useStore().date)}>${store.data().date}</span>
+        <span ${$f(() => store.data().date)}>${store.data().date}</span>
       </h4>
     </div>
   `;
