@@ -34,3 +34,16 @@ Version 4 thoughts:
 
 - Would such a concept (manual framework.redraw()) allow more freedom?
 - e.g. would it be possible to know what had been 'get' knowing parent,propertyName, old value. Then on redraw() compare old values with new to invoke the reactive container functions
+
+## Version 6
+
+Dispenses with the notion of global state, allows components to have an API. BRings much logic down into the components. Not ideal.
+
+## Version 7
+
+My preferred approach.
+Dispenses with the notion of global state. The thinking here is that global state is duplicated in the DOM anyway. We will almost never generate global state from existing global state. We will almost always derive it from API data. So why keep UI data in a store and update the store just to update the DOM. Why not just update the DOM directly and cut out the middle man (store).
+By aligning functions that return HTML with HTML elements we can replace those HTMl elements with the new data/component.
+It also allows elements to be promoted to allow vanilla JS to invoke components below them (the mothership paradigm).
+While not complete (including the need for a mutation observer garbage collector like earlier versions) it does have real potential.
+It lends itself to a clear path to server rendering with the client seamlessly taking over.
